@@ -33,7 +33,7 @@ const page = () => {
   }
 
   return (
-    <div className="flex flex-col items-center h-screen py-28 w-2/3 mx-auto">
+    <div className="flex flex-col items-center h-screen py-28 w-2/3 mx-auto max-w-7xl">
       <div className="w-full flex flex-col gap-6 border-b-2 border-neutral-700 pb-8">
         <div className="flex flex-col gap-2 ">
           <div className="text-5xl font-bold">Secret Recovery Phrase</div>
@@ -58,7 +58,7 @@ const page = () => {
         </button>
       </div>
 
-      <div className="grid grid-cols-4 gap-4 mt-8 w-full ">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8 w-full ">
         {phrase.map((word) => (
           <div className="bg-neutral-800 text-neutral-300 px-6 py-2 rounded font-medium text-center">
             {word}
@@ -67,10 +67,7 @@ const page = () => {
       </div>
       {phrase.length === 12 ? (
         <div className="border-t-2 border-neutral-700 mt-8 w-full py-8">
-
-            <div>
-                Wallet
-            </div>
+          <div>Wallet</div>
         </div>
       ) : (
         <div></div>
