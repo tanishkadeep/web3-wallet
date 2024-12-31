@@ -6,7 +6,7 @@ export default function Home() {
       <div className="text-4xl font-bold mb-6">Web3 Wallet</div>
 
       <Link
-        href="/mnemonics"
+        href="/wallet"
         className="bg-neutral-100 text-neutral-800 px-8 py-2 rounded-md font-semibold"
       >
         Get Started
