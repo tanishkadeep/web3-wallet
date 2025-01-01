@@ -9,7 +9,7 @@ import { Keypair } from "@solana/web3.js";
 import bs58 from "bs58";
 import { IoMdCheckmark } from "react-icons/io";
 
-const page = () => {
+const Wallet = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [phrase, setPhrase] = useState<string[]>([]);
   const [disabled, setDisabled] = useState<boolean>(false);
@@ -103,8 +103,8 @@ const page = () => {
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8 w-full ">
-        {phrase.map((word) => (
-          <div className="bg-neutral-800 text-neutral-300 px-6 py-2 rounded font-medium text-center">
+        {phrase.map((word, index) => (
+          <div className="bg-neutral-800 text-neutral-300 px-6 py-2 rounded font-medium text-center" key={index}>
             {word}
           </div>
         ))}
@@ -148,4 +148,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Wallet;
