@@ -9,6 +9,7 @@ import { derivePath } from "ed25519-hd-key";
 import { Keypair } from "@solana/web3.js";
 import bs58 from "bs58";
 import { IoMdCheckmark } from "react-icons/io";
+import Footer from "@/components/Footer";
 
 export default function Home() {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -87,7 +88,7 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col items-center h-screen py-28 w-2/3 mx-auto max-w-7xl">
+    <div className="flex flex-col items-center h-screen pt-28 w-2/3 mx-auto max-w-7xl justify-between">
       <div className="w-full flex flex-col gap-6">
         <div className="flex flex-col gap-2 ">
           <div className="text-5xl font-bold">Secret Recovery Phrase</div>
@@ -146,7 +147,7 @@ export default function Home() {
               className="mb-6 border-b border-neutral-700 pb-6 last:border-b-0"
             >
               <div className="text-2xl font-semibold mb-4">
-                Wallet {index + 1}
+                Account {index + 1}
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
                 <div className="text-lg font-medium">Public Key:</div>
@@ -194,6 +195,8 @@ export default function Home() {
           <IoMdCheckmark /> Copied to clipboard
         </div>
       )}
+
+      <Footer />
     </div>
   );
 }
