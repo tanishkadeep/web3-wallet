@@ -153,7 +153,7 @@ export default function Home() {
                 <div className="col-span-2 bg-neutral-800 text-neutral-300 py-2 rounded flex items-center justify-between px-4 gap-4">
                   <div className="truncate text-sm">{wallet.publicKey}</div>
                   <MdContentCopy
-                    className="cursor-pointer text-neutral-600 dark:text-neutral-300 hover:scale-105 w-4 h-4"
+                    className="cursor-pointer text-neutral-600 dark:text-neutral-300 hover:scale-105 w-6 h-6 mx-0 sm:w-4 sm:h-4"
                     onClick={() => copy(wallet.publicKey)}
                   />
                 </div>
