@@ -14,9 +14,9 @@ export default function Home() {
   const [phrase, setPhrase] = useState<string[]>([]);
   const [disabled, setDisabled] = useState<boolean>(false);
   const [showToast, setShowToast] = useState<boolean>(false);
-
-  const [publicKey, setPublicKey] = useState<string>("");
-  const [privateKey, setPrivateKey] = useState<string>("");
+  const [wallets, setWallets] = useState<
+    { publicKey: string; privateKey: string }[]
+  >([]);
 
   const copy = (text: string) => {
     if (text) {
@@ -31,6 +31,16 @@ export default function Home() {
         });
     }
   };
+
+  function generateWallet(index: number, words?: string) {
+    const seed = mnemonicToSeedSync(words!);
+    const path = `m/44'/501'/${index}'/0'`;
+    const derivedSeed = derivePath(path, seed.toString("hex")).key;
+    const secret = nacl.sign.keyPair.fromSeed(derivedSeed).secretKey;
+    const publicKey = Keypair.fromSecretKey(secret).publicKey.toBase58();
+    const privateKey = bs58.encode(Keypair.fromSecretKey(secret).secretKey);
+    return { publicKey, privateKey };
+  }
 
   function generate() {
     let words = inputRef.current?.value;
@@ -55,13 +65,14 @@ export default function Home() {
     inputRef.current!.value = "";
     setDisabled(true);
 
-    const seed = mnemonicToSeedSync(words!);
-    const path = `m/44'/501'/1'/0'`;
-    const derivedSeed = derivePath(path, seed.toString("hex")).key;
-    const secret = nacl.sign.keyPair.fromSeed(derivedSeed).secretKey;
-    setPublicKey(Keypair.fromSecretKey(secret).publicKey.toBase58());
-    const keypair = Keypair.fromSecretKey(secret);
-    setPrivateKey(bs58.encode(keypair.secretKey));
+    const firstWallet = generateWallet(0, words);
+    setWallets([firstWallet]);
+  }
+
+  function addWallet() {
+    const newWalletIndex = wallets.length;
+    const newWallet = generateWallet(newWalletIndex, phrase.join(" "));
+    setWallets([...wallets, newWallet]);
   }
 
   return (
@@ -89,6 +100,7 @@ export default function Home() {
           Generate Wallet
         </button>
       </div>
+
       <div className="flex justify-end w-full -mt-4">
         {phrase.length === 12 ? (
           <button
@@ -112,34 +124,48 @@ export default function Home() {
           </div>
         ))}
       </div>
-      {phrase.length === 12 ? (
+
+      {wallets.length > 0 && (
         <div className="border-t-2 border-neutral-700 mt-8 w-full py-8">
-          <div className="text-4xl font-bold mb-6">Wallet</div>
+          <div className="text-4xl font-bold mb-6">Wallets</div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
-            {/* Public Key */}
-            <div className="text-lg font-medium">Public Key:</div>
-            <div className="col-span-2 bg-neutral-800 text-neutral-300 py-2 rounded flex items-center justify-between px-6 gap-4">
-              <div className="truncate">{publicKey}</div>
-              <MdContentCopy
-                className="cursor-pointer text-neutral-600 dark:text-neutral-300 hover:scale-105 w-20"
-                onClick={() => copy(publicKey)}
-              />
-            </div>
+          {wallets.map((wallet, index) => (
+            <div
+              key={index}
+              className="mb-6 border-b border-neutral-700 pb-6 last:border-b-0"
+            >
+              <div className="text-2xl font-semibold mb-4">
+                Wallet {index + 1}
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+                <div className="text-lg font-medium">Public Key:</div>
+                <div className="col-span-2 bg-neutral-800 text-neutral-300 py-2 rounded flex items-center justify-between px-6 gap-4">
+                  <div className="truncate">{wallet.publicKey}</div>
+                  <MdContentCopy
+                    className="cursor-pointer text-neutral-600 dark:text-neutral-300 hover:scale-105 w-20"
+                    onClick={() => copy(wallet.publicKey)}
+                  />
+                </div>
 
-            {/* Private Key */}
-            <div className="text-lg font-medium mt-2">Private Key:</div>
-            <div className="col-span-2 bg-neutral-800 text-neutral-300 py-2 rounded flex items-center justify-between px-6 gap-4">
-              <div className="truncate">{privateKey}</div>
-              <MdContentCopy
-                className="cursor-pointer text-neutral-600 dark:text-neutral-300 hover:scale-105 w-20"
-                onClick={() => copy(privateKey)}
-              />
+                <div className="text-lg font-medium mt-2">Private Key:</div>
+                <div className="col-span-2 bg-neutral-800 text-neutral-300 py-2 rounded flex items-center justify-between px-6 gap-4">
+                  <div className="truncate">{wallet.privateKey}</div>
+                  <MdContentCopy
+                    className="cursor-pointer text-neutral-600 dark:text-neutral-300 hover:scale-105 w-20"
+                    onClick={() => copy(wallet.privateKey)}
+                  />
+                </div>
+              </div>
             </div>
-          </div>
+          ))}
+
+          <button
+            className="bg-neutral-200 hover:bg-neutral-50 text-neutral-800 px-6 py-1.5 rounded-md font-semibold text-center mt-4"
+            onClick={addWallet}
+          >
+            Add a Wallet
+          </button>
         </div>
-      ) : (
-        <div></div>
       )}
 
       {showToast && (
