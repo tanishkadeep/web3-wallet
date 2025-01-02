@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { MdContentCopy } from "react-icons/md";
+import { IoEye } from "react-icons/io5";
 import nacl from "tweetnacl";
 import { generateMnemonic, mnemonicToSeedSync } from "bip39";
 import { derivePath } from "ed25519-hd-key";
@@ -15,7 +16,7 @@ export default function Home() {
   const [disabled, setDisabled] = useState<boolean>(false);
   const [showToast, setShowToast] = useState<boolean>(false);
   const [wallets, setWallets] = useState<
-    { publicKey: string; privateKey: string }[]
+    { publicKey: string; privateKey: string; showPrivateKey: boolean }[]
   >([]);
 
   const copy = (text: string) => {
@@ -39,7 +40,17 @@ export default function Home() {
     const secret = nacl.sign.keyPair.fromSeed(derivedSeed).secretKey;
     const publicKey = Keypair.fromSecretKey(secret).publicKey.toBase58();
     const privateKey = bs58.encode(Keypair.fromSecretKey(secret).secretKey);
-    return { publicKey, privateKey };
+    return { publicKey, privateKey, showPrivateKey: false };
+  }
+
+  function togglePrivateKey(index: number) {
+    setWallets((prevWallets) =>
+      prevWallets.map((wallet, i) =>
+        i === index
+          ? { ...wallet, showPrivateKey: !wallet.showPrivateKey }
+          : wallet
+      )
+    );
   }
 
   function generate() {
@@ -139,21 +150,31 @@ export default function Home() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
                 <div className="text-lg font-medium">Public Key:</div>
-                <div className="col-span-2 bg-neutral-800 text-neutral-300 py-2 rounded flex items-center justify-between px-6 gap-4">
-                  <div className="truncate">{wallet.publicKey}</div>
+                <div className="col-span-2 bg-neutral-800 text-neutral-300 py-2 rounded flex items-center justify-between px-4 gap-4">
+                  <div className="truncate text-sm">{wallet.publicKey}</div>
                   <MdContentCopy
-                    className="cursor-pointer text-neutral-600 dark:text-neutral-300 hover:scale-105 w-20"
+                    className="cursor-pointer text-neutral-600 dark:text-neutral-300 hover:scale-105 w-4 h-4"
                     onClick={() => copy(wallet.publicKey)}
                   />
                 </div>
 
                 <div className="text-lg font-medium mt-2">Private Key:</div>
-                <div className="col-span-2 bg-neutral-800 text-neutral-300 py-2 rounded flex items-center justify-between px-6 gap-4">
-                  <div className="truncate">{wallet.privateKey}</div>
-                  <MdContentCopy
-                    className="cursor-pointer text-neutral-600 dark:text-neutral-300 hover:scale-105 w-20"
-                    onClick={() => copy(wallet.privateKey)}
-                  />
+                <div className="col-span-2 bg-neutral-800 text-neutral-300 py-2 rounded flex items-center justify-between px-4 gap-4">
+                  <div className="truncate text-sm">
+                    {wallet.showPrivateKey
+                      ? wallet.privateKey
+                      : "•".repeat(wallet.privateKey.length)}
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <IoEye
+                      className="cursor-pointer text-neutral-600 dark:text-neutral-300 hover:scale-105 w-5 h-5"
+                      onClick={() => togglePrivateKey(index)}
+                    />
+                    <MdContentCopy
+                      className="cursor-pointer text-neutral-600 dark:text-neutral-300 hover:scale-105 w-4 h-4 mx-0"
+                      onClick={() => copy(wallet.privateKey)}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
